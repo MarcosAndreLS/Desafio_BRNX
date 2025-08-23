@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    /* Diretórios */
+    "rootDir": "./src",    // onde está o código-fonte
+    "outDir": "./dist",    // pasta para o JS compilado
+
+    /* Ambiente */
+    "target": "ES2020",    // versão do JS gerada
+    "module": "CommonJS",  // padrão Node.js
+    "lib": ["ES2020"],     // funcionalidades JS disponíveis
+    "types": ["node"],     // tipagens do Node.js
+    "esModuleInterop": true, // facilita importações comuns (ex: express)
+    
+    /* Boas práticas */
+    "strict": true,        // ativa checagem rígida de tipos
+    "skipLibCheck": true,  // ignora checagem de tipos de libs externas
+    "sourceMap": true      // gera source maps para debug
+  },
+  "include": ["src"],      // compila apenas a pasta src
+  "exclude": ["node_modules", "dist"] // ignora essas pastas
+}
