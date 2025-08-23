@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
+    "prisma": "prisma",
     "start": "node dist/server.js"
   },
   "keywords": [],
