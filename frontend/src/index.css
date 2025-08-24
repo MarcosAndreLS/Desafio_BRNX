@@ -1,13 +1,159 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Brnx NetControl Design System - Dark Mode Focus */
+
+@layer base {
+  :root {
+    /* Core Brand Colors - Dark Mode Primary */
+    --background: 210 100% 6.5%; /* #000F21 */
+    --background-secondary: 210 100% 5.1%; /* #000C1A */
+    --foreground: 0 0% 100%; /* #FFFFFF */
+
+    /* Card System */
+    --card: 210 100% 5.1%; /* #000C1A */
+    --card-foreground: 0 0% 100%;
+    --card-hover: 210 65% 8%;
+
+    /* Interactive Elements */
+    --popover: 210 100% 5.1%;
+    --popover-foreground: 0 0% 100%;
+
+    /* Brand Primary - #1C6DAF */
+    --primary: 209 72% 41%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 209 72% 35%;
+
+    /* Brand Accent - #2128F6 */
+    --accent: 238 92% 55%;
+    --accent-foreground: 0 0% 100%;
+    --accent-hover: 238 92% 45%;
+
+    /* Secondary System */
+    --secondary: 210 65% 12%;
+    --secondary-foreground: 0 0% 85%;
+    --secondary-hover: 210 65% 15%;
+
+    /* Muted Elements */
+    --muted: 210 65% 8%;
+    --muted-foreground: 0 0% 65%;
+
+    /* Status Colors */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 48 96% 53%;
+    --warning-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Interactive States */
+    --border: 210 65% 15%;
+    --input: 210 65% 12%;
+    --ring: 209 72% 41%;
+
+    /* Layout */
+    --radius: 0.75rem;
+
+    /* Sidebar System */
+    --sidebar-background: 210 100% 5.1%; /* #000C1A */
+    --sidebar-foreground: 0 0% 85%;
+    --sidebar-primary: 209 72% 41%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 65% 12%;
+    --sidebar-accent-foreground: 0 0% 85%;
+    --sidebar-border: 210 65% 15%;
+    --sidebar-ring: 209 72% 41%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(209 72% 41%), hsl(238 92% 55%));
+    --gradient-background: linear-gradient(180deg, hsl(210 100% 6.5%), hsl(210 100% 5.1%));
+    --gradient-card: linear-gradient(145deg, hsl(210 65% 8%), hsl(210 65% 6%));
+    
+    /* Shadows */
+    --shadow-sm: 0 2px 4px hsl(210 100% 3% / 0.1);
+    --shadow-md: 0 4px 12px hsl(210 100% 3% / 0.15);
+    --shadow-lg: 0 8px 25px hsl(210 100% 3% / 0.2);
+    --shadow-glow: 0 0 20px hsl(209 72% 41% / 0.15);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-spring: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    background: var(--gradient-background);
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-background-secondary;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
+}
+
+@layer components {
+  /* Glass Effect */
+  .glass {
+    @apply bg-card/50 backdrop-blur-sm border border-border/50;
+  }
+
+  /* Glow Effect */
+  .glow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  /* Smooth Transitions */
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+
+  .transition-spring {
+    transition: var(--transition-spring);
+  }
+
+  /* Interactive States */
+  .interactive {
+    @apply transition-smooth hover:scale-[1.02] hover:shadow-md;
+  }
+
+  /* Card Variants */
+  .card-elevated {
+    @apply bg-card border border-border/50 shadow-md hover:shadow-lg transition-smooth;
+  }
+
+  .card-glass {
+    @apply glass shadow-sm hover:bg-card/70 transition-smooth;
+  }
+
+  /* Status Indicators */
+  .status-pending {
+    @apply bg-warning/20 text-warning border-warning/30;
+  }
+
+  .status-progress {
+    @apply bg-primary/20 text-primary border-primary/30;
+  }
+
+  .status-completed {
+    @apply bg-success/20 text-success border-success/30;
+  }
 }
