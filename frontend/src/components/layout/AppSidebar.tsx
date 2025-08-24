@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Logo from "@/assets/logo.png";
 import { NavLink, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, 
@@ -57,7 +58,7 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
         {!isCollapsed && (
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-              <span className="text-sm font-bold text-white">BN</span>
+              <img src={Logo} alt="Logo" className="w-8 h-8 object-cover rounded-lg" />
             </div>
             <div>
               <h2 className="text-sm font-semibold text-sidebar-foreground">BRNX NetControl</h2>
