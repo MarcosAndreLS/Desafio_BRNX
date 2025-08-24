@@ -39,7 +39,7 @@ const Dashboard = () => {
             value={stats.totalDemands}
             description="Todas as demandas cadastradas"
             icon={<ClipboardList className="h-6 w-6" />}
-            trend={{ value: 12, isPositive: true }}
+            //trend={{ value: 18, isPositive: true }}
           />
           
           <StatsCard
@@ -54,7 +54,7 @@ const Dashboard = () => {
             value={stats.pendingDemands}
             description="Aguardando atendimento"
             icon={<Clock className="h-6 w-6" />}
-            className="border-warning/30"
+            
           />
           
           <StatsCard
@@ -62,7 +62,7 @@ const Dashboard = () => {
             value={stats.completedDemands}
             description="Finalizadas com sucesso"
             icon={<CheckCircle className="h-6 w-6" />}
-            className="border-success/30"
+            
           />
         </div>
 
@@ -78,20 +78,20 @@ const Dashboard = () => {
             
             <div className="space-y-4">
               {[
-                { status: 'pendente', count: stats.pendingDemands, color: 'warning' },
-                { status: 'em_andamento', count: stats.inProgressDemands, color: 'primary' },
-                { status: 'concluida', count: stats.completedDemands, color: 'success' }
-              ].map(({ status, count, color }) => (
+                { status: 'pendente', count: stats.pendingDemands, colorClass: 'bg-warning', bgClass: 'bg-warning/20', textClass: 'text-warning' },
+                { status: 'em_andamento', count: stats.inProgressDemands, colorClass: 'bg-primary', bgClass: 'bg-primary/20', textClass: 'text-primary' },
+                { status: 'concluida', count: stats.completedDemands, colorClass: 'bg-success', bgClass: 'bg-success/20', textClass: 'text-success' }
+              ].map(({ status, count, colorClass, bgClass, textClass }) => (
                 <div key={status} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
                   <div className="flex items-center space-x-3">
-                    <div className={`w-3 h-3 rounded-full bg-${color}`} />
+                    <div className={`w-3 h-3 rounded-full ${colorClass}`} />
                     <span className="text-sm font-medium text-foreground">
                       {DEMAND_STATUS_LABELS[status as keyof typeof DEMAND_STATUS_LABELS]}
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className="text-lg font-bold text-foreground">{count}</span>
-                    <div className={`px-2 py-1 rounded-full bg-${color}/20 text-${color} text-xs font-medium`}>
+                    <div className={`px-2 py-1 rounded-full ${bgClass} ${textClass} text-xs font-medium`}>
                       {((count / stats.totalDemands) * 100).toFixed(0)}%
                     </div>
                   </div>
