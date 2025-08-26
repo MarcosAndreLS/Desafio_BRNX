@@ -5,7 +5,13 @@ CREATE TYPE "public"."DemandType" AS ENUM ('DIAGNOSTICO', 'MANUTENCAO', 'CONFIGU
 CREATE TYPE "public"."DemandStatus" AS ENUM ('PENDENTE', 'EM_ANDAMENTO', 'CONCLUIDA', 'CANCELADA');
 
 -- CreateEnum
-CREATE TYPE "public"."UserRole" AS ENUM ('ADMIN', 'CONSULTOR', 'MONITORAMENTO');
+CREATE TYPE "public"."DemandPriority" AS ENUM ('BAIXA', 'MEDIA', 'ALTA', 'CRITICA');
+
+-- CreateEnum
+CREATE TYPE "public"."UserRole" AS ENUM ('ADMIN', 'CONSULTOR', 'ATENDENTE');
+
+-- CreateEnum
+CREATE TYPE "public"."ActionType" AS ENUM ('ANALISE', 'CONFIGURACAO', 'MANUTENCAO', 'COMUNICACAO', 'RESOLUCAO');
 
 -- CreateTable
 CREATE TABLE "public"."User" (
@@ -13,7 +19,7 @@ CREATE TABLE "public"."User" (
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "role" "public"."UserRole" NOT NULL DEFAULT 'MONITORAMENTO',
+    "role" "public"."UserRole" NOT NULL DEFAULT 'ATENDENTE',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -40,6 +46,7 @@ CREATE TABLE "public"."Demand" (
     "descricao" TEXT NOT NULL,
     "tipo" "public"."DemandType" NOT NULL,
     "status" "public"."DemandStatus" NOT NULL DEFAULT 'PENDENTE',
+    "prioridade" "public"."DemandPriority" NOT NULL DEFAULT 'BAIXA',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "providerId" TEXT NOT NULL,
@@ -51,6 +58,7 @@ CREATE TABLE "public"."Demand" (
 CREATE TABLE "public"."Action" (
     "id" TEXT NOT NULL,
     "descricao" TEXT NOT NULL,
+    "tipo" "public"."ActionType" NOT NULL,
     "executadaEm" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "demandId" TEXT NOT NULL,
     "tecnicoId" TEXT,
@@ -77,7 +85,13 @@ CREATE INDEX "Demand_status_idx" ON "public"."Demand"("status");
 CREATE INDEX "Demand_tipo_idx" ON "public"."Demand"("tipo");
 
 -- CreateIndex
+CREATE INDEX "Demand_prioridade_idx" ON "public"."Demand"("prioridade");
+
+-- CreateIndex
 CREATE INDEX "Action_demandId_idx" ON "public"."Action"("demandId");
+
+-- CreateIndex
+CREATE INDEX "Action_tipo_idx" ON "public"."Action"("tipo");
 
 -- AddForeignKey
 ALTER TABLE "public"."Demand" ADD CONSTRAINT "Demand_providerId_fkey" FOREIGN KEY ("providerId") REFERENCES "public"."Provider"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
