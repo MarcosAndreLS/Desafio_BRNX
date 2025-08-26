@@ -30,10 +30,26 @@ enum DemandStatus {
   CANCELADA
 }
 
+enum DemandPriority {
+  BAIXA
+  MEDIA
+  ALTA
+  CRITICA
+}
+
+
 enum UserRole {
   ADMIN
   CONSULTOR
-  MONITORAMENTO
+  ATENDENTE
+}
+
+enum ActionType {
+  ANALISE
+  CONFIGURACAO
+  MANUTENCAO
+  COMUNICACAO
+  RESOLUCAO
 }
 
 // ----- models -----
@@ -42,7 +58,7 @@ model User {
   name      String
   email     String   @unique
   password  String   // hash
-  role      UserRole @default(MONITORAMENTO)
+  role      UserRole @default(ATENDENTE)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -64,34 +80,39 @@ model Provider {
 }
 
 model Demand {
-  id          String       @id @default(uuid())
+  id          String          @id @default(uuid())
   titulo      String
   descricao   String
   tipo        DemandType
-  status      DemandStatus @default(PENDENTE)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  status      DemandStatus    @default(PENDENTE)
+  prioridade  DemandPriority  @default(BAIXA) // novo campo
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
 
   providerId  String
-  provider    Provider     @relation(fields: [providerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  provider    Provider        @relation(fields: [providerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
   actions     Action[]
 
   @@index([providerId])
   @@index([status])
   @@index([tipo])
+  @@index([prioridade]) // facilita filtros por prioridade
 }
 
+
 model Action {
-  id          String   @id @default(uuid())
+  id          String     @id @default(uuid())
   descricao   String
-  executadaEm DateTime @default(now())
+  tipo        ActionType
+  executadaEm DateTime   @default(now())
 
   demandId    String
-  demand      Demand   @relation(fields: [demandId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  demand      Demand     @relation(fields: [demandId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   tecnicoId   String?
-  tecnico     User?    @relation(fields: [tecnicoId], references: [id], onDelete: SetNull)
+  tecnico     User?      @relation(fields: [tecnicoId], references: [id], onDelete: SetNull)
 
   @@index([demandId])
+  @@index([tipo])
 }
