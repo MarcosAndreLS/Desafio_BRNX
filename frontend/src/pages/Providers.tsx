@@ -3,6 +3,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useNavigate } from "react-router-dom";
 import { mockProviders } from "@/data/mockData";
 import { 
   Plus, 
@@ -16,6 +17,7 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 const Providers = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   
   const filteredProviders = mockProviders.filter(provider =>
@@ -35,7 +37,10 @@ const Providers = () => {
             </p>
           </div>
           
-          <Button className="bg-gradient-primary hover:opacity-90 transition-opacity">
+          <Button 
+            className="bg-gradient-primary hover:opacity-90 transition-opacity"
+            onClick={() => navigate("/providers/new")}
+          >
             <Plus className="h-4 w-4 mr-2" />
             Novo Provedor
           </Button>
@@ -138,7 +143,7 @@ const Providers = () => {
                 : "Comece cadastrando seu primeiro provedor"
               }
             </p>
-            <Button>
+            <Button onClick={() => navigate("/providers/new")}>
               <Plus className="h-4 w-4 mr-2" />
               Cadastrar Provedor
             </Button>
