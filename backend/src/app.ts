@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import providerRoutes from "./routes/providerRoutes";
 
 dotenv.config();
 
@@ -12,5 +13,7 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.json({ message: "API is running 🚀" });
 });
+
+app.use("/providers", providerRoutes);
 
 export default app;
