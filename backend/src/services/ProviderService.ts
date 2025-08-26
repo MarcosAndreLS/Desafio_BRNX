@@ -5,9 +5,9 @@ const providerRepository = new ProviderRepository();
 export class ProviderService {
   async createProvider(
     nomeFantasia: string,
-    responsavel?: string,
-    email?: string,
-    telefone?: string
+    responsavel: string,
+    email: string,
+    telefone: string
   ) {
     // verifica se o email já está cadastrado
     if (email) {

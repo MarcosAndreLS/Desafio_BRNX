@@ -30,9 +30,9 @@ CREATE TABLE "public"."User" (
 CREATE TABLE "public"."Provider" (
     "id" TEXT NOT NULL,
     "nomeFantasia" TEXT NOT NULL,
-    "responsavel" TEXT,
-    "email" TEXT,
-    "telefone" TEXT,
+    "responsavel" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "telefone" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
