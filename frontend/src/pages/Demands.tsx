@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const Demands = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -75,7 +77,10 @@ const Demands = () => {
             </p>
           </div>
           
-          <Button className="bg-gradient-primary hover:opacity-90 transition-opacity">
+          <Button 
+            className="bg-gradient-primary hover:opacity-90 transition-opacity"
+            onClick={() => navigate("/demands/new")}
+          >
             <Plus className="h-4 w-4 mr-2" />
             Nova Demanda
           </Button>
@@ -178,7 +183,11 @@ const Demands = () => {
                     </span>
                   </div>
                   
-                  <Button variant="outline" size="sm">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => navigate(`/demands/${demand.id}`)}
+                  >
                     Ver Detalhes
                   </Button>
                 </div>
@@ -212,7 +221,7 @@ const Demands = () => {
                 : "Comece registrando sua primeira demanda"
               }
             </p>
-            <Button>
+            <Button onClick={() => navigate("/demands/new")}>
               <Plus className="h-4 w-4 mr-2" />
               Nova Demanda
             </Button>
