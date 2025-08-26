@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import providerRoutes from "./routes/providerRoutes";
+import demandRoutes from "./routes/demandRoutes";
 
 dotenv.config();
 
@@ -15,5 +16,6 @@ app.get("/", (req, res) => {
 });
 
 app.use("/providers", providerRoutes);
+app.use("/demands", demandRoutes);
 
 export default app;
