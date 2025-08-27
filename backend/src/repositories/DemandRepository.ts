@@ -1,4 +1,4 @@
-import { PrismaClient, Demand } from '../generated/prisma';
+import { PrismaClient, Demand, DemandStatus } from '../generated/prisma';
 
 const prisma = new PrismaClient();
 
@@ -13,5 +13,12 @@ export class DemandRepository {
 
   async findById(id: string) {
     return prisma.demand.findUnique({ where: { id }, include: { provider: true } });
+  }
+
+  async updateStatus(id: string, status: DemandStatus) {
+    return prisma.demand.update({
+      where: { id },
+      data: { status },
+    });
   }
 }
