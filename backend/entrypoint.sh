@@ -14,5 +14,8 @@ fi
 echo "Aplicando migrations..."
 npx prisma migrate deploy
 
+echo "Rodando seed inicial..."
+npx prisma db seed
+
 echo "Iniciando aplicação..."
 exec "$@"
