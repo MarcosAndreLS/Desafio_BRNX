@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { mockDemands } from "@/data/mockData";
+import { StatusUpdater } from "@/components/StatusUpdater";
 import { DEMAND_STATUS_LABELS, DEMAND_TYPE_LABELS, DEMAND_PRIORITY_LABELS } from "@/types";
 import { 
   Plus, 
@@ -25,17 +26,26 @@ const Demands = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
-  
+  const [demandStatuses, setDemandStatuses] = useState<Record<string, string>>({});
+
   const filteredDemands = mockDemands.filter(demand => {
+    const currentStatus = demandStatuses[demand.id] || demand.status;
     const matchesSearch = demand.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          demand.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          demand.providerName.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesStatus = statusFilter === "all" || demand.status === statusFilter;
+    const matchesStatus = statusFilter === "all" || currentStatus === statusFilter;
     const matchesType = typeFilter === "all" || demand.type === typeFilter;
     
     return matchesSearch && matchesStatus && matchesType;
   });
+
+  const handleStatusChange = (demandId: string, newStatus: string) => {
+    setDemandStatuses(prev => ({
+      ...prev,
+      [demandId]: newStatus
+    }));
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -176,12 +186,12 @@ const Demands = () => {
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <div className={`flex items-center gap-1 px-2 py-1 rounded-md status-${demand.status}`}>
-                    {getStatusIcon(demand.status)}
-                    <span className="text-xs font-medium">
-                      {DEMAND_STATUS_LABELS[demand.status]}
-                    </span>
-                  </div>
+                  <StatusUpdater
+                    currentStatus={demandStatuses[demand.id] || demand.status}
+                    demandId={demand.id}
+                    onStatusChange={(newStatus) => handleStatusChange(demand.id, newStatus)}
+                    variant="inline"
+                  />
                   
                   <Button 
                     variant="outline" 
