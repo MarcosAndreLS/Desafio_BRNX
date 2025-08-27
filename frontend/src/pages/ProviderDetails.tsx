@@ -89,7 +89,11 @@ export default function ProviderDetails() {
             </p>
           </div>
           <div className="flex space-x-2">
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => navigate(`/providers/${provider.id}/edit`)}
+            >
               <Edit className="h-4 w-4 mr-2" />
               Editar
             </Button>
