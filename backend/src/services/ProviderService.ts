@@ -1,4 +1,7 @@
 import { ProviderRepository } from "../repositories/ProviderRepository";
+import { PrismaClient } from '../generated/prisma';
+
+const prisma = new PrismaClient();
 
 const providerRepository = new ProviderRepository();
 
@@ -23,4 +26,14 @@ export class ProviderService {
   async listProviders() {
     return providerRepository.findAll();
   }
+
+  async deleteProvider(id: string) {
+  const existing = await providerRepository.findById(id);
+  if (!existing) throw new Error("Provedor não encontrado");
+
+  // remove demandas vinculadas
+  await prisma.demand.deleteMany({ where: { providerId: id } });
+
+  return providerRepository.deleteById(id);
+}
 }

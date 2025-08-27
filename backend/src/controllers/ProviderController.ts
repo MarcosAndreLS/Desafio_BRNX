@@ -18,4 +18,14 @@ export class ProviderController {
     const providers = await providerService.listProviders();
     return res.json(providers);
   }
+
+  async delete(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      await providerService.deleteProvider(id);
+      return res.status(200).json({ message: "Provedor excluído com sucesso" });
+    } catch (err: any) {
+      return res.status(400).json({ error: err.message });
+    }
+  }
 }
