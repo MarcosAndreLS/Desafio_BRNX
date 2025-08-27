@@ -1,9 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useNavigate } from "react-router-dom";
 import { mockProviders } from "@/data/mockData";
 import { 
   Plus, 
@@ -90,9 +90,6 @@ const Providers = () => {
                     <DropdownMenuItem className="text-popover-foreground hover:bg-muted">
                       Editar
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="text-popover-foreground hover:bg-muted">
-                      Ver Demandas
-                    </DropdownMenuItem>
                     <DropdownMenuItem className="text-destructive hover:bg-destructive/10">
                       Excluir
                     </DropdownMenuItem>
@@ -123,7 +120,11 @@ const Providers = () => {
                   <span className="font-semibold text-foreground">{provider.demandsCount}</span>
                 </div>
                 
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => navigate(`/providers/${provider.id}`)}
+                >
                   Ver Detalhes
                 </Button>
               </div>
