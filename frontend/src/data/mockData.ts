@@ -1,4 +1,4 @@
-import { Provider, Demand, DemandAction } from "@/types";
+import { Provider, Demand, DemandAction, User } from "@/types";
 
 export const mockProviders: Provider[] = [
   {
@@ -142,6 +142,41 @@ export const mockDemands: Demand[] = [
     createdAt: new Date('2024-08-23T10:30:00'),
     updatedAt: new Date('2024-08-23T10:30:00'),
     actions: []
+  }
+];
+
+export const mockConsultors: User[] = [
+  {
+    id: "1",
+    name: "Carlos Técnico",
+    email: "carlos@empresa.com",
+    role: "consultor",
+    isActive: true,
+    createdAt: new Date('2024-01-10')
+  },
+  {
+    id: "2", 
+    name: "Roberto Silva",
+    email: "roberto@empresa.com",
+    role: "consultor",
+    isActive: true,
+    createdAt: new Date('2024-02-15')
+  },
+  {
+    id: "3",
+    name: "Ana Rede",
+    email: "ana@empresa.com", 
+    role: "consultor",
+    isActive: true,
+    createdAt: new Date('2024-03-20')
+  },
+  {
+    id: "4",
+    name: "José Silva",
+    email: "jose@empresa.com",
+    role: "consultor", 
+    isActive: true,
+    createdAt: new Date('2024-04-05')
   }
 ];
 

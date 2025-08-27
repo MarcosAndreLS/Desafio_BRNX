@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { ArrowLeft, Plus, User, Calendar, Clock, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { mockDemands } from "@/data/mockData";
+import { mockDemands, mockConsultors } from "@/data/mockData";
 import { 
   DEMAND_TYPE_LABELS, 
   DEMAND_STATUS_LABELS, 
@@ -26,7 +26,7 @@ import { ptBR } from "date-fns/locale";
 
 const actionSchema = z.object({
   description: z.string().min(10, "Descrição deve ter pelo menos 10 caracteres"),
-  technician: z.string().min(2, "Nome do técnico é obrigatório"),
+  consultorId: z.string().min(1, "Consultor é obrigatório"),
   actionType: z.string().min(1, "Tipo de ação é obrigatório"),
 });
 
@@ -53,7 +53,7 @@ export default function DemandDetails() {
     resolver: zodResolver(actionSchema),
     defaultValues: {
       description: "",
-      technician: "",
+      consultorId: "",
       actionType: "",
     },
   });
@@ -94,11 +94,13 @@ export default function DemandDetails() {
   const onSubmit = async (data: ActionFormData) => {
     setIsSubmitting(true);
     
+    const selectedConsultor = mockConsultors.find(c => c.id === data.consultorId);
+
     const newAction: DemandAction = {
       id: `action-${Date.now()}`,
       demandId: demand.id,
       description: data.description,
-      technician: data.technician,
+      technician: selectedConsultor?.name || "",
       executedAt: new Date(),
       actionType: data.actionType as any,
     };
@@ -253,7 +255,7 @@ export default function DemandDetails() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Tipo de Ação</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Selecione o tipo" />
@@ -274,13 +276,24 @@ export default function DemandDetails() {
 
                     <FormField
                       control={form.control}
-                      name="technician"
+                      name="consultorId"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Técnico</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Nome do técnico" {...field} />
-                          </FormControl>
+                          <FormLabel>Consultor</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecione o consultor" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {mockConsultors.filter(c => c.isActive).map((consultor) => (
+                                <SelectItem key={consultor.id} value={consultor.id}>
+                                  {consultor.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                           <FormMessage />
                         </FormItem>
                       )}
