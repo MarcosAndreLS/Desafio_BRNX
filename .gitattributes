@@ -1,0 +1,8 @@
+# Sempre usar LF em scripts shell
+*.sh text eol=lf
+
+# Para segurança, você pode forçar também para arquivos sensíveis
+*.sh     eol=lf
+*.sh     text executable
+*.env    text eol=lf
+Dockerfile text eol=lf
