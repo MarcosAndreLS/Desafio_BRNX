@@ -9,6 +9,7 @@ import Providers from "./pages/Providers";
 import Demands from "./pages/Demands";
 import NewProvider from "./pages/NewProvider";
 import ProviderDetails from "./pages/ProviderDetails";
+import EditProvider from "./pages/EditProvider";
 import NewDemand from "./pages/NewDemand";
 import DemandDetails from "./pages/DemandDetails";
 import NotFound from "./pages/NotFound";
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/providers" element={<Providers />} />
           <Route path="/providers/new" element={<NewProvider />} />
           <Route path="/providers/:id" element={<ProviderDetails />} />
+          <Route path="/providers/:id/edit" element={<EditProvider />} />
           <Route path="/demands" element={<Demands />} />
           <Route path="/demands/new" element={<NewDemand />} />
           <Route path="/demands/:id" element={<DemandDetails />} />

@@ -87,7 +87,10 @@ const Providers = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="bg-popover border border-border">
-                    <DropdownMenuItem className="text-popover-foreground hover:bg-muted">
+                    <DropdownMenuItem 
+                      className="text-popover-foreground hover:bg-muted"
+                      onClick={() => navigate(`/providers/${provider.id}/edit`)}
+                    >
                       Editar
                     </DropdownMenuItem>
                     <DropdownMenuItem className="text-destructive hover:bg-destructive/10">
