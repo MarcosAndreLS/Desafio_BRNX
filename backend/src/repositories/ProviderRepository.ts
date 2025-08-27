@@ -24,4 +24,11 @@ export class ProviderRepository {
       where: { id },
     });
   }
+
+  async updateById(id: string, data: Partial<Omit<Provider, "id" | "createdAt" | "updatedAt">>) {
+    return prisma.provider.update({
+      where: { id },
+      data,
+    });
+  }
 }

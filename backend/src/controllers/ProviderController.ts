@@ -28,4 +28,22 @@ export class ProviderController {
       return res.status(400).json({ error: err.message });
     }
   }
+
+  async update(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { nomeFantasia, responsavel, email, telefone } = req.body;
+
+      const updated = await providerService.updateProvider(id, {
+        nomeFantasia,
+        responsavel,
+        email,
+        telefone,
+      });
+
+      return res.json(updated);
+    } catch (err: any) {
+      return res.status(400).json({ error: err.message });
+    }
+  }
 }
