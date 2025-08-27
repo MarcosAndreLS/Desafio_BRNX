@@ -1,8 +1,16 @@
-# Sempre usar LF em scripts shell
+# Força scripts de shell a usarem LF (Linux)
 *.sh text eol=lf
 
-# Para segurança, você pode forçar também para arquivos sensíveis
-*.sh     eol=lf
-*.sh     text executable
-*.env    text eol=lf
+# Arquivos de código
+*.js text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.jsx text eol=lf
+
+# SQL sempre com LF
+*.sql text eol=lf
+
+# Docker e configs
 Dockerfile text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
