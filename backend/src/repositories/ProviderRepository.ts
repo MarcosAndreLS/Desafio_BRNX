@@ -18,4 +18,10 @@ export class ProviderRepository {
   async findByEmail(email: string) {
     return prisma.provider.findUnique({ where: { email } });
   }
+
+  async deleteById(id: string) {
+    return prisma.provider.delete({
+      where: { id },
+    });
+  }
 }
