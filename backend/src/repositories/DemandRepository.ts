@@ -21,7 +21,17 @@ export class DemandRepository {
 }
 
   async findById(id: string) {
-    return prisma.demand.findUnique({ where: { id }, include: { provider: true } });
+    return prisma.demand.findUnique({
+      where: { id },
+      include: {
+        provider: true,
+        actions: {
+          include: {
+            tecnico: true, // Adicionado para incluir os dados do técnico na ação
+          },
+        },
+      },
+    });
   }
 
   async updateStatus(id: string, status: DemandStatus) {

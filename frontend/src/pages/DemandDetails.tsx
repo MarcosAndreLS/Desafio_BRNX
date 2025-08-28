@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,9 +13,13 @@ import { Input } from "../components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../components/ui/form";
 import { useToast } from "../hooks/use-toast";
-import { ArrowLeft, Plus, User, Calendar, Clock, AlertTriangle, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, User, Calendar, Clock, AlertTriangle, Trash2, Loader2 } from "lucide-react";
 import { ConfirmDialog } from "../components/ui/confirm-dialog";
-import { mockDemands, mockConsultors } from "../data/mockData";
+//import { mockDemands, mockConsultors } from "../data/mockData";
+import { Demand } from "@/generated/prisma";
+import { createAction } from "@/api/actions";
+import { getConsultors } from "@/api/users";
+import { getDemandById } from "@/api/demands";
 import { 
   DEMAND_TYPE_LABELS, 
   DEMAND_STATUS_LABELS, 
@@ -48,8 +52,10 @@ export default function DemandDetails() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [actions, setActions] = useState<DemandAction[]>([]);
   const [deleteDialog, setDeleteDialog] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [demand, setDemand] = useState<Demand | null>(null);
 
-  const demand = mockDemands.find(d => d.id === id);
+  const [consultors, setConsultors] = useState<any[]>([]);
 
   const form = useForm<ActionFormData>({
     resolver: zodResolver(actionSchema),
@@ -59,6 +65,31 @@ export default function DemandDetails() {
       actionType: "",
     },
   });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!id) {
+        setIsLoading(false);
+        return;
+      }
+      setIsLoading(true);
+      try {
+        // Busque a demanda e os consultores em paralelo para otimizar
+        const [demandData, consultorsData] = await Promise.all([
+          getDemandById(id), // Supondo que você criou essa função em @/api/demands
+          getConsultors() // A nova função que você criou em @/api/users
+        ]);
+        
+        setDemand(demandData);
+        setConsultors(consultorsData);
+      } catch (error) {
+        console.error("Erro ao buscar dados:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, [id]);
 
   if (!demand) {
     return (
@@ -75,20 +106,20 @@ export default function DemandDetails() {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'critica': return 'bg-destructive text-destructive-foreground';
-      case 'alta': return 'bg-warning text-warning-foreground';
-      case 'media': return 'bg-primary text-primary-foreground';
-      case 'baixa': return 'bg-success text-success-foreground';
+      case 'CRITICA': return 'bg-destructive text-destructive-foreground';
+      case 'ALTA': return 'bg-warning text-warning-foreground';
+      case 'MEDIA': return 'bg-primary text-primary-foreground';
+      case 'BAIXA': return 'bg-success text-success-foreground';
       default: return 'bg-muted text-muted-foreground';
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pendente': return 'bg-warning text-warning-foreground';
-      case 'em_andamento': return 'bg-primary text-primary-foreground';
-      case 'concluida': return 'bg-success text-success-foreground';
-      case 'cancelada': return 'bg-destructive text-destructive-foreground';
+      case 'PENDENTE': return 'bg-warning text-warning-foreground';
+      case 'EM_ANDAMENTO': return 'bg-primary text-primary-foreground';
+      case 'CONCLUIDA': return 'bg-success text-success-foreground';
+      case 'CANCELADA': return 'bg-destructive text-destructive-foreground';
       default: return 'bg-muted text-muted-foreground';
     }
   };
@@ -96,29 +127,43 @@ export default function DemandDetails() {
   const onSubmit = async (data: ActionFormData) => {
     setIsSubmitting(true);
     
-    const selectedConsultor = mockConsultors.find(c => c.id === data.consultorId);
+    try {
+      // Dados para a requisição da API
+      const actionData = {
+        descricao: data.description,
+        tipo: data.actionType,
+        demandId: demand.id,
+        tecnicoId: data.consultorId,
+      };
 
-    const newAction: DemandAction = {
-      id: `action-${Date.now()}`,
-      demandId: demand.id,
-      description: data.description,
-      technician: selectedConsultor?.name || "",
-      executedAt: new Date(),
-      actionType: data.actionType as any,
-    };
+      // Chama a API para criar a ação
+      const newAction = await createAction(actionData);
+      
+      // Atualiza o estado da demanda com a nova ação
+      setDemand(prevDemand => {
+        if (!prevDemand) return null;
+        return {
+          ...prevDemand,
+          actions: [...prevDemand.actions, newAction]
+        };
+      });
 
-    // Simular salvamento
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    setActions(prev => [...prev, newAction]);
-    form.reset();
-    
-    toast({
-      title: "Sucesso!",
-      description: "Ação registrada com sucesso.",
-    });
-    
-    setIsSubmitting(false);
+      form.reset();
+      
+      toast({
+        title: "Sucesso!",
+        description: "Ação registrada com sucesso.",
+      });
+    } catch (error) {
+      console.error("Erro ao registrar a ação:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível registrar a ação.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const allActions = [...demand.actions, ...actions];
@@ -130,6 +175,17 @@ export default function DemandDetails() {
     });
     navigate("/demands");
   };
+
+  if (isLoading) {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <span className="ml-2 text-lg text-muted-foreground">Carregando detalhes...</span>
+        </div>
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout>
@@ -146,7 +202,7 @@ export default function DemandDetails() {
               <span>Voltar</span>
             </Button>
             <div>
-              <h1 className="text-3xl font-bold text-foreground">{demand.title}</h1>
+              <h1 className="text-3xl font-bold text-foreground">{demand.titulo}</h1>
               <p className="text-muted-foreground">
                 Detalhes e histórico da demanda
               </p>
@@ -171,11 +227,11 @@ export default function DemandDetails() {
                 <CardTitle className="flex items-center justify-between">
                   Informações da Demanda
                   <div className="flex space-x-2">
-                    <Badge className={getPriorityColor(demand.priority)}>
-                      {DEMAND_PRIORITY_LABELS[demand.priority as keyof typeof DEMAND_PRIORITY_LABELS]}
+                    <Badge className={getPriorityColor(demand.prioridade)}>
+                      {demand.prioridade}
                     </Badge>
                     <Badge className={getStatusColor(demand.status)}>
-                      {DEMAND_STATUS_LABELS[demand.status as keyof typeof DEMAND_STATUS_LABELS]}
+                      {demand.status}
                     </Badge>
                   </div>
                 </CardTitle>
@@ -183,20 +239,20 @@ export default function DemandDetails() {
               <CardContent className="space-y-4">
                 <div>
                   <h4 className="font-medium text-foreground mb-2">Descrição</h4>
-                  <p className="text-muted-foreground">{demand.description}</p>
+                  <p className="text-muted-foreground">{demand.descricao}</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="flex items-center space-x-2">
                     <User className="h-4 w-4 text-muted-foreground" />
                     <span className="text-muted-foreground">Provedor:</span>
-                    <span className="font-medium">{demand.providerName}</span>
+                    <span className="font-medium">{demand.provider.nomeFantasia}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <AlertTriangle className="h-4 w-4 text-muted-foreground" />
                     <span className="text-muted-foreground">Tipo:</span>
                     <span className="font-medium">
-                      {DEMAND_TYPE_LABELS[demand.type as keyof typeof DEMAND_TYPE_LABELS]}
+                      {demand.tipo}
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -206,13 +262,6 @@ export default function DemandDetails() {
                       {format(demand.createdAt, "dd/MM/yyyy", { locale: ptBR })}
                     </span>
                   </div>
-                  {demand.assignedTo && (
-                    <div className="flex items-center space-x-2">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">Responsável:</span>
-                      <span className="font-medium">{demand.assignedTo}</span>
-                    </div>
-                  )}
                 </div>
               </CardContent>
             </Card>
@@ -232,17 +281,17 @@ export default function DemandDetails() {
                       <div key={action.id} className="border-l-2 border-primary pl-4 pb-4">
                         <div className="flex items-center justify-between mb-2">
                           <Badge variant="outline">
-                            {actionTypeLabels[action.actionType]}
+                            {action.tipo}
                           </Badge>
                           <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                             <Clock className="h-4 w-4" />
                             <span>
-                              {format(action.executedAt, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                              {format(action.executadaEm, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
                             </span>
                           </div>
                         </div>
-                        <p className="text-sm text-foreground mb-1">{action.description}</p>
-                        <p className="text-xs text-muted-foreground">Por: {action.technician}</p>
+                        <p className="text-sm text-foreground mb-1">{action.descricao}</p>
+                        <p className="text-xs text-muted-foreground">Por: {action.tecnico?.nome || 'Não atribuído'}</p>
                       </div>
                     ))}
                   </div>
@@ -308,7 +357,7 @@ export default function DemandDetails() {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {mockConsultors.filter(c => c.isActive).map((consultor) => (
+                              {consultors.map((consultor) => (
                                 <SelectItem key={consultor.id} value={consultor.id}>
                                   {consultor.name}
                                 </SelectItem>
@@ -364,6 +413,8 @@ export default function DemandDetails() {
           variant="destructive"
           icon={<Trash2 className="h-5 w-5 text-destructive" />}
         />
+
+        {/* O restante do código do div e AppLayout */}
       </div>
     </AppLayout>
   );
