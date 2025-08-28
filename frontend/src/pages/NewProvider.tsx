@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { ArrowLeft, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { createProvider } from "@/api/providers";
 
 const providerSchema = z.object({
   fantasyName: z.string().min(2, "Nome fantasia deve ter pelo menos 2 caracteres"),
@@ -38,16 +39,37 @@ export default function NewProvider() {
   const onSubmit = async (data: ProviderFormData) => {
     setIsSubmitting(true);
     
-    // Simular salvamento
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    toast({
-      title: "Sucesso!",
-      description: "Provedor cadastrado com sucesso.",
-    });
-    
-    setIsSubmitting(false);
-    navigate("/providers");
+    try {
+      // 1. Chamar a função de API para criar o provedor
+      await createProvider({ 
+        nomeFantasia: data.fantasyName,
+        responsavel: data.responsibleName,
+        email: data.email,
+        telefone: data.phone,
+      });
+
+      // 2. Exibir toast de sucesso
+      toast({
+        title: "Sucesso!",
+        description: "Provedor cadastrado com sucesso.",
+      });
+
+      // 3. Redirecionar para a tela de provedores
+      navigate("/providers");
+
+    } catch (error) {
+      // 4. Lidar com erros da requisição
+      console.error("Erro ao cadastrar provedor:", error);
+      toast({
+        title: "Erro",
+        description: "Ocorreu um erro ao cadastrar o provedor. Tente novamente.",
+        variant: "destructive",
+      });
+
+    } finally {
+      // 5. Garantir que o estado de submissão seja redefinido
+      setIsSubmitting(false);
+    }
   };
 
   return (

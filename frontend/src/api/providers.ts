@@ -17,3 +17,18 @@ export const getProviders = async () => {
 export const deleteProvider = async (id: number) => {
   await api.delete(`/providers/${id}`);
 };
+
+export const getProviderById = async (id: string) => {
+  const { data } = await api.get(`/providers/${id}`);
+  return data;
+};
+
+export const createProvider = async (providerData) => {
+  const { data } = await api.post("/providers", providerData);
+  return data;
+};
+
+export const updateProvider = async (id: string, providerData) => {
+  const { data } = await api.patch(`/providers/${id}`, providerData);
+  return data;
+};

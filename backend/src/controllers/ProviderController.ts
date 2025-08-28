@@ -46,4 +46,14 @@ export class ProviderController {
       return res.status(400).json({ error: err.message });
     }
   }
+
+  async getById(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const provider = await providerService.getProviderById(id);
+      res.json(provider);
+    } catch (err: any) {
+      res.status(404).json({ error: err.message });
+    }
+  }
 }
