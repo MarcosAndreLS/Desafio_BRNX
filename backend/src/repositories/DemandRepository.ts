@@ -8,11 +8,17 @@ export class DemandRepository {
   }
 
   async findAll(status?: DemandStatus) {
-    return prisma.demand.findMany({
-      where: status ? { status } : undefined,
-      include: { provider: true },
-    });
-  }
+  return prisma.demand.findMany({
+    where: status ? { status } : undefined,
+    include: {
+      provider: true, // Já estava presente
+      actions: true,  // Adicionado para incluir as ações
+    },
+    orderBy: {
+      createdAt: 'desc', // Adiciona ordenação para que as demandas mais recentes apareçam primeiro
+    }
+  });
+}
 
   async findById(id: string) {
     return prisma.demand.findUnique({ where: { id }, include: { provider: true } });
