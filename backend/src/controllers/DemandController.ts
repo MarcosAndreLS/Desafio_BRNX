@@ -45,4 +45,19 @@ export class DemandController {
       return res.status(400).json({ error: err.message });
     }
   }
+
+  async getById(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      
+      const demand = await demandService.getDemandDetails(id); 
+      if (!demand) {
+        return res.status(404).json({ error: "Demanda não encontrada." });
+      }
+
+      return res.json(demand);
+    } catch (err: any) {
+      return res.status(400).json({ error: err.message });
+    }
+  }
 }

@@ -19,3 +19,8 @@ export const updateDemandStatus = async (id: string, newStatus: string) => {
   const { data } = await api.patch(`/demands/${id}/status`, { status: newStatus.toUpperCase() });
   return data;
 };
+
+export const getDemandById = async (id: string) => {
+  const { data } = await api.get(`/demands/${id}`);
+  return data;
+};

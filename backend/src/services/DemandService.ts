@@ -48,4 +48,8 @@ export class DemandService {
     // Atualiza status
     return demandRepository.updateStatus(id, newStatus);
   }
+
+  async getDemandDetails(id: string) {
+    return demandRepository.findById(id); 
+  }
 }
