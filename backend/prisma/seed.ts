@@ -1,9 +1,17 @@
 import { PrismaClient } from '../src/generated/prisma';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log("🚀 Iniciando seed...");
+
+  const saltRounds = 10;
+  const senhaPadrao = "123456";
+
+  // Hasheie as senhas antes de criar os usuários
+  const hashedPasswordAdmin = await bcrypt.hash(senhaPadrao, saltRounds);
+  const hashedPasswordConsultor = await bcrypt.hash(senhaPadrao, saltRounds);
 
   // cria usuários básicos
   await prisma.user.createMany({
@@ -11,13 +19,13 @@ async function main() {
       {
         name: "Administrador",
         email: "admin@teste.com",
-        password: "123456", // em produção deve ser hasheada
+        password: hashedPasswordAdmin, // em produção deve ser hasheada
         role: "ADMIN",
       },
       {
         name: "Consultor João",
         email: "joao@teste.com",
-        password: "123456",
+        password: hashedPasswordConsultor,
         role: "CONSULTOR",
       },
     ],

@@ -24,8 +24,13 @@ export class ProviderService {
   }
 
   async listProviders() {
-    return providerRepository.findAll();
-  }
+    // Inclui o array completo de demandas para cada provedor
+    return prisma.provider.findMany({
+      include: {
+        demandas: true, // Isso busca todas as demandas relacionadas a cada provedor
+      },
+    });
+}
 
   async deleteProvider(id: string) {
     const existing = await providerRepository.findById(id);

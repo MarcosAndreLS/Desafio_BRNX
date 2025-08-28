@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { mockProviders } from "@/data/mockData";
 import { 
   Plus, 
   Search, 
@@ -16,14 +15,56 @@ import {
 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
+import { getProviders, deleteProvider } from "@/api/providers";
+
 const Providers = () => {
   const navigate = useNavigate();
+  const [providers, setProviders] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   
-  const filteredProviders = mockProviders.filter(provider =>
-    provider.fantasyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    provider.responsibleName.toLowerCase().includes(searchTerm.toLowerCase())
+  // Carregar provedores do backend
+  useEffect(() => {
+    const loadProviders = async () => {
+      try {
+        const data = await getProviders();
+        
+        const providersWithCounts = data.map((provider: any) => {
+          // Assume que a propriedade 'demandas' é um array de objetos
+          const demandsCount = provider.demandas?.length ?? 0;
+
+          return {
+            ...provider,
+            createdAt: new Date(provider.createdAt),
+            updatedAt: new Date(provider.updatedAt),
+            demandsCount: demandsCount,
+          };
+        });
+
+        setProviders(providersWithCounts);
+
+      } catch (err) {
+        console.error("Erro ao carregar provedores:", err);
+      }
+    };
+    loadProviders();
+  }, []);
+
+  const filteredProviders = providers.filter(provider =>
+    provider.nomeFantasia?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    provider.responsavel?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Função para excluir com confirmação
+  const handleDelete = async (id: number) => {
+    if (window.confirm("Tem certeza que deseja excluir este provedor?")) {
+      try {
+        await deleteProvider(id);
+        setProviders(prev => prev.filter(p => p.id !== id)); // Atualiza lista local
+      } catch (err) {
+        console.error("Erro ao excluir provedor:", err);
+      }
+    }
+  };
 
   return (
     <AppLayout>
@@ -54,7 +95,7 @@ const Providers = () => {
               <Input
                 placeholder="Buscar provedores..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
             </div>
@@ -72,10 +113,10 @@ const Providers = () => {
                   </div>
                   <div className="space-y-1">
                     <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
-                      {provider.fantasyName}
+                      {provider.nomeFantasia}
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      {provider.responsibleName}
+                      {provider.responsavel}
                     </p>
                   </div>
                 </div>
@@ -93,7 +134,10 @@ const Providers = () => {
                     >
                       Editar
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="text-destructive hover:bg-destructive/10">
+                    <DropdownMenuItem 
+                      className="text-destructive hover:bg-destructive/10"
+                      onClick={() => handleDelete(provider.id)}
+                    >
                       Excluir
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -108,12 +152,12 @@ const Providers = () => {
                 
                 <div className="flex items-center text-sm text-muted-foreground">
                   <Phone className="h-4 w-4 mr-2" />
-                  <span>{provider.phone}</span>
+                  <span>{provider.telefone}</span>
                 </div>
                 
                 <div className="flex items-center text-sm text-muted-foreground">
                   <Calendar className="h-4 w-4 mr-2" />
-                  <span>Cadastrado em {provider.createdAt.toLocaleDateString('pt-BR')}</span>
+                  <span>Cadastrado em {new Date(provider.createdAt).toLocaleDateString('pt-BR')}</span>
                 </div>
               </div>
 

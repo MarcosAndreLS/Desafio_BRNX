@@ -56,7 +56,7 @@ const Dashboard = () => {
 
   const recentDemands = [...demands]
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
-    .slice(0, 5);
+    .slice(0, 4);
 
   return (
     <AppLayout>
