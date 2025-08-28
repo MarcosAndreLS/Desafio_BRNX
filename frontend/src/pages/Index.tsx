@@ -1,7 +1,7 @@
+import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { StatsCard } from "@/components/ui/stats-card";
 import { Card } from "@/components/ui/card";
-import { getDashboardStats, mockDemands } from "@/data/mockData";
 import { DEMAND_STATUS_LABELS } from "@/types";
 import { 
   ClipboardList, 
@@ -13,11 +13,48 @@ import {
   Activity
 } from "lucide-react";
 
+import { fetchDemands, fetchProviders } from "@/api/dashboard";
+
 const Dashboard = () => {
-  const stats = getDashboardStats();
+  const [demands, setDemands] = useState<any[]>([]);
+  const [providers, setProviders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   
-  // Recent demands for activity feed
-  const recentDemands = mockDemands
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [demandsData, providersData] = await Promise.all([
+          fetchDemands(),
+          fetchProviders()
+        ]);
+        setDemands(demandsData);
+        setProviders(providersData);
+      } catch (error) {
+        console.error("Erro ao carregar dados do dashboard", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  if (loading) {
+    return (
+      <AppLayout>
+        <div className="p-6 text-center">Carregando...</div>
+      </AppLayout>
+    );
+  }
+
+  // ---- Estatísticas calculadas no front ----
+  const totalDemands = demands.length;
+  const totalProviders = providers.length;
+  const pendingDemands = demands.filter(d => d.status === "PENDENTE").length;
+  const inProgressDemands = demands.filter(d => d.status === "EM_ANDAMENTO").length;
+  const completedDemands = demands.filter(d => d.status === "CONCLUIDA").length;
+
+  const recentDemands = [...demands]
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
     .slice(0, 5);
 
@@ -36,7 +73,7 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatsCard
             title="Total de Demandas"
-            value={stats.totalDemands}
+            value={totalDemands}
             description="Todas as demandas cadastradas"
             icon={<ClipboardList className="h-6 w-6" />}
             //trend={{ value: 18, isPositive: true }}
@@ -44,14 +81,14 @@ const Dashboard = () => {
           
           <StatsCard
             title="Provedores Ativos"
-            value={stats.totalProviders}
+            value={totalProviders}
             description="Provedores cadastrados"
             icon={<Building2 className="h-6 w-6" />}
           />
           
           <StatsCard
             title="Pendentes"
-            value={stats.pendingDemands}
+            value={pendingDemands}
             description="Aguardando atendimento"
             icon={<Clock className="h-6 w-6" />}
             
@@ -59,7 +96,7 @@ const Dashboard = () => {
           
           <StatsCard
             title="Concluídas"
-            value={stats.completedDemands}
+            value={completedDemands}
             description="Finalizadas com sucesso"
             icon={<CheckCircle className="h-6 w-6" />}
             
@@ -78,9 +115,9 @@ const Dashboard = () => {
             
             <div className="space-y-4">
               {[
-                { status: 'pendente', count: stats.pendingDemands, colorClass: 'bg-warning', bgClass: 'bg-warning/20', textClass: 'text-warning' },
-                { status: 'em_andamento', count: stats.inProgressDemands, colorClass: 'bg-primary', bgClass: 'bg-primary/20', textClass: 'text-primary' },
-                { status: 'concluida', count: stats.completedDemands, colorClass: 'bg-success', bgClass: 'bg-success/20', textClass: 'text-success' }
+                { status: 'pendente', count: pendingDemands, colorClass: 'bg-warning', bgClass: 'bg-warning/20', textClass: 'text-warning' },
+                { status: 'em_andamento', count: inProgressDemands, colorClass: 'bg-primary', bgClass: 'bg-primary/20', textClass: 'text-primary' },
+                { status: 'concluida', count: completedDemands, colorClass: 'bg-success', bgClass: 'bg-success/20', textClass: 'text-success' }
               ].map(({ status, count, colorClass, bgClass, textClass }) => (
                 <div key={status} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
                   <div className="flex items-center space-x-3">
@@ -92,7 +129,7 @@ const Dashboard = () => {
                   <div className="flex items-center space-x-2">
                     <span className="text-lg font-bold text-foreground">{count}</span>
                     <div className={`px-2 py-1 rounded-full ${bgClass} ${textClass} text-xs font-medium`}>
-                      {((count / stats.totalDemands) * 100).toFixed(0)}%
+                      {((count / totalDemands) * 100).toFixed(0)}%
                     </div>
                   </div>
                 </div>
@@ -113,10 +150,10 @@ const Dashboard = () => {
                   <div className="flex items-start justify-between">
                     <div className="space-y-1 flex-1">
                       <p className="text-sm font-medium text-foreground line-clamp-2">
-                        {demand.title}
+                        {demand.titulo}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {demand.providerName}
+                        {demand.provider?.nomeFantasia ?? "Sem provedor"}
                       </p>
                     </div>
                     <div className={`ml-3 px-2 py-1 rounded-full text-xs font-medium status-${demand.status}`}>
@@ -126,9 +163,9 @@ const Dashboard = () => {
                   
                   <div className="flex items-center justify-between mt-2 pt-2 border-t border-border/30">
                     <span className="text-xs text-muted-foreground">
-                      {new Date(demand.updatedAt).toLocaleDateString('pt-BR')}
+                      {new Date(demand.updatedAt).toLocaleDateString("pt-BR")}
                     </span>
-                    {demand.priority === 'critica' && (
+                    {demand.prioridade === "CRITICA" && (
                       <AlertTriangle className="h-3 w-3 text-destructive" />
                     )}
                   </div>
