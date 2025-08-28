@@ -21,8 +21,8 @@ export class DemandService {
     });
   }
 
-  async listDemands() {
-    return demandRepository.findAll();
+  async listDemands(status?: DemandStatus) {
+    return demandRepository.findAll(status);
   }
 
   async changeStatus(id: string, newStatus: DemandStatus) {

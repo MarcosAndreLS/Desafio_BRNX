@@ -16,8 +16,18 @@ export class DemandController {
   }
 
   async list(req: Request, res: Response) {
-    const demands = await demandService.listDemands();
-    return res.json(demands);
+    try {
+      const { status } = req.query;
+
+      if (status && !Object.values(DemandStatus).includes(status as DemandStatus)) {
+        return res.status(400).json({ error: "Status inválido" });
+      }
+
+      const demands = await demandService.listDemands(status as DemandStatus | undefined);
+      return res.json(demands);
+    } catch (err: any) {
+      return res.status(400).json({ error: err.message });
+    }
   }
 
   async changeStatus(req: Request, res: Response) {

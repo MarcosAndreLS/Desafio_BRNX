@@ -7,8 +7,11 @@ export class DemandRepository {
     return prisma.demand.create({ data });
   }
 
-  async findAll() {
-    return prisma.demand.findMany({ include: { provider: true } });
+  async findAll(status?: DemandStatus) {
+    return prisma.demand.findMany({
+      where: status ? { status } : undefined,
+      include: { provider: true },
+    });
   }
 
   async findById(id: string) {
