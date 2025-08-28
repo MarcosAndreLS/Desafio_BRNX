@@ -38,11 +38,11 @@ const actionSchema = z.object({
 type ActionFormData = z.infer<typeof actionSchema>;
 
 const actionTypeLabels = {
-  analysis: 'Análise',
-  configuration: 'Configuração',
-  maintenance: 'Manutenção',
-  communication: 'Comunicação',
-  resolution: 'Resolução'
+  ANALISE: 'Análise',
+  CONFIGURACAO: 'Configuração',
+  MANUTENCAO: 'Manutenção',
+  COMUNICACAO: 'Comunicação',
+  RESOLUCAO: 'Resolução'
 };
 
 export default function DemandDetails() {
