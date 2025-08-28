@@ -4,6 +4,8 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Plus, 
   Search, 
@@ -11,7 +13,8 @@ import {
   Mail, 
   Phone, 
   Calendar,
-  MoreVertical
+  MoreVertical,
+  Trash2
 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
@@ -19,8 +22,10 @@ import { getProviders, deleteProvider } from "@/api/providers";
 
 const Providers = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [providers, setProviders] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; providerId?: string }>({ open: false });
   
   // Carregar provedores do backend
   useEffect(() => {
@@ -53,6 +58,35 @@ const Providers = () => {
     provider.nomeFantasia?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     provider.responsavel?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleDeleteProvider = async () => {
+    if (deleteDialog.providerId) {
+      try {
+        // 1. Chamar a API de exclusão
+        await deleteProvider(deleteDialog.providerId); // A função do seu arquivo `api/providers.js`
+
+        // 2. Se a exclusão no backend for bem-sucedida, atualize o estado no frontend
+        setProviders(providers.filter(p => p.id !== deleteDialog.providerId));
+        
+        // 3. Exibir um toast de sucesso
+        toast({
+          title: "Provedor excluído",
+          description: "O provedor foi removido com sucesso!",
+        });
+
+      } catch (error) {
+        // 4. Lidar com erros
+        console.error("Erro ao excluir provedor:", error);
+        toast({
+          title: "Erro",
+          description: "Ocorreu um erro ao excluir o provedor.",
+          variant: "destructive",
+        });
+      }
+    }
+    // 5. Fechar o modal de confirmação
+    setDeleteDialog({ open: false });
+};
 
   return (
     <AppLayout>
@@ -124,7 +158,7 @@ const Providers = () => {
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       className="text-destructive hover:bg-destructive/10"
-                      onClick={() => handleDelete(provider.id)}
+                      onClick={() => setDeleteDialog({ open: true, providerId: provider.id })}
                     >
                       Excluir
                     </DropdownMenuItem>
@@ -185,6 +219,18 @@ const Providers = () => {
             </Button>
           </Card>
         )}
+        {/* Delete Confirmation Dialog */}
+        <ConfirmDialog
+          open={deleteDialog.open}
+          onOpenChange={(open) => setDeleteDialog({ open })}
+          onConfirm={handleDeleteProvider}
+          title="Excluir Provedor"
+          description="Tem certeza que deseja excluir este provedor? Esta ação não pode ser desfeita."
+          confirmText="Excluir"
+          cancelText="Cancelar"
+          variant="destructive"
+          icon={<Trash2 className="h-5 w-5 text-destructive" />}
+        />
       </div>
     </AppLayout>
   );
