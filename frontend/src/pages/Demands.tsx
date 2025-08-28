@@ -74,6 +74,21 @@ const Demands = () => {
     }
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "PENDENTE":
+        return "bg-secondary text-secondary-foreground";
+      case "EM_ANDAMENTO":
+        return "bg-primary text-primary-foreground";
+      case "CONCLUIDA":
+        return "bg-green-500 text-green-50-foreground";
+      case "CANCELADA":
+        return "bg-destructive text-destructive-foreground";
+      default:
+        return "bg-muted text-muted-foreground";
+    }
+  };
+
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "CRITICA":
@@ -168,6 +183,10 @@ const Demands = () => {
                           </h3>
                           <Badge className={getPriorityColor(demand.prioridade)}>
                             {demand.prioridade}
+                          </Badge>
+                          <Badge className={getStatusColor(demand.status)}>
+                            <span className="mr-1">{getStatusIcon(demand.status)}</span>
+                            {demand.status}
                           </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground line-clamp-2">{demand.descricao}</p>
