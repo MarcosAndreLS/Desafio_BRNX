@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { StatsCard } from "@/components/ui/stats-card";
 import { Card } from "@/components/ui/card";
 import { DEMAND_STATUS_LABELS } from "@/types";
+import { Button } from "@/components/ui/button";
 import { 
   ClipboardList, 
   Building2, 
@@ -10,12 +12,15 @@ import {
   CheckCircle, 
   AlertTriangle,
   TrendingUp,
-  Activity
+  Activity,
+  Plus,
+  FileText
 } from "lucide-react";
 
 import { fetchDemands, fetchProviders } from "@/api/dashboard";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [demands, setDemands] = useState<any[]>([]);
   const [providers, setProviders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,11 +67,32 @@ const Dashboard = () => {
     <AppLayout>
       <div className="space-y-6 animate-fade-in">
         {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground">
-            Visão geral do sistema de gestão de demandas técnicas
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+            <p className="text-muted-foreground">
+              Visão geral do sistema de gestão de demandas técnicas
+            </p>
+          </div>
+          
+          {/* Quick Actions */}
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button 
+              variant="outline"
+              onClick={() => navigate("/demands/new")}
+              className="border-primary/20 hover:bg-primary/10"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Nova Demanda
+            </Button>
+            <Button 
+              onClick={() => navigate("/providers/new")}
+              className="bg-gradient-primary hover:opacity-90"
+            >
+              <Building2 className="h-4 w-4 mr-2" />
+              Novo Provedor
+            </Button>
+          </div>
         </div>
 
         {/* Stats Grid */}

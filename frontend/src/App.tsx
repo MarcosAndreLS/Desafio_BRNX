@@ -12,6 +12,7 @@ import ProviderDetails from "./pages/ProviderDetails";
 import EditProvider from "./pages/EditProvider";
 import NewDemand from "./pages/NewDemand";
 import DemandDetails from "./pages/DemandDetails";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/demands" element={<Demands />} />
           <Route path="/demands/new" element={<NewDemand />} />
           <Route path="/demands/:id" element={<DemandDetails />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
