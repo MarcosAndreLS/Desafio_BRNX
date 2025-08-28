@@ -3,18 +3,19 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { AppLayout } from "@/components/layout/AppLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { ArrowLeft, Plus, User, Calendar, Clock, AlertTriangle } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { mockDemands, mockConsultors } from "@/data/mockData";
+import { AppLayout } from "../components/layout/AppLayout";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { Badge } from "../components/ui/badge";
+import { Separator } from "../components/ui/separator";
+import { Textarea } from "../components/ui/textarea";
+import { Input } from "../components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../components/ui/form";
+import { useToast } from "../hooks/use-toast";
+import { ArrowLeft, Plus, User, Calendar, Clock, AlertTriangle, Trash2 } from "lucide-react";
+import { ConfirmDialog } from "../components/ui/confirm-dialog";
+import { mockDemands, mockConsultors } from "../data/mockData";
 import { 
   DEMAND_TYPE_LABELS, 
   DEMAND_STATUS_LABELS, 
@@ -46,6 +47,7 @@ export default function DemandDetails() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [actions, setActions] = useState<DemandAction[]>([]);
+  const [deleteDialog, setDeleteDialog] = useState(false);
 
   const demand = mockDemands.find(d => d.id === id);
 
@@ -121,25 +123,44 @@ export default function DemandDetails() {
 
   const allActions = [...demand.actions, ...actions];
 
+  const handleDeleteDemand = () => {
+    toast({
+      title: "Demanda excluída",
+      description: "A demanda foi removida com sucesso!"
+    });
+    navigate("/demands");
+  };
+
   return (
     <AppLayout>
       <div className="space-y-6">
-        <div className="flex items-center space-x-4">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => navigate("/demands")}
-            className="flex items-center space-x-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span>Voltar</span>
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">{demand.title}</h1>
-            <p className="text-muted-foreground">
-              Detalhes e histórico da demanda
-            </p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate("/demands")}
+              className="flex items-center space-x-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span>Voltar</span>
+            </Button>
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">{demand.title}</h1>
+              <p className="text-muted-foreground">
+                Detalhes e histórico da demanda
+              </p>
+            </div>
           </div>
+          
+          <Button 
+            variant="outline"
+            onClick={() => setDeleteDialog(true)}
+            className="border-destructive/20 text-destructive hover:bg-destructive/10"
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Excluir Demanda
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -255,7 +276,7 @@ export default function DemandDetails() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Tipo de Ação</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Selecione o tipo" />
@@ -280,7 +301,7 @@ export default function DemandDetails() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Consultor</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Selecione o consultor" />
@@ -330,6 +351,19 @@ export default function DemandDetails() {
             </Card>
           </div>
         </div>
+
+        {/* Delete Confirmation Dialog */}
+        <ConfirmDialog
+          open={deleteDialog}
+          onOpenChange={setDeleteDialog}
+          onConfirm={handleDeleteDemand}
+          title="Excluir Demanda"
+          description="Tem certeza que deseja excluir esta demanda? Esta ação não pode ser desfeita e todos os dados relacionados serão perdidos."
+          confirmText="Excluir"
+          cancelText="Cancelar"
+          variant="destructive"
+          icon={<Trash2 className="h-5 w-5 text-destructive" />}
+        />
       </div>
     </AppLayout>
   );

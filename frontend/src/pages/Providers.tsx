@@ -54,18 +54,6 @@ const Providers = () => {
     provider.responsavel?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Função para excluir com confirmação
-  const handleDelete = async (id: number) => {
-    if (window.confirm("Tem certeza que deseja excluir este provedor?")) {
-      try {
-        await deleteProvider(id);
-        setProviders(prev => prev.filter(p => p.id !== id)); // Atualiza lista local
-      } catch (err) {
-        console.error("Erro ao excluir provedor:", err);
-      }
-    }
-  };
-
   return (
     <AppLayout>
       <div className="space-y-6 animate-fade-in">
