@@ -1,4 +1,6 @@
-import { useState } from "react";
+// Dentro de EditProvider.tsx
+
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,15 +10,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { ArrowLeft } from "lucide-react";
-// import { useToast } from "@/hooks/use-toast";
-import { mockProviders } from "@/data/mockData";
+import { ArrowLeft, Save } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+// Importe as novas funções da API
+import { getProviderById, updateProvider } from "@/api/providers";
 
 const providerSchema = z.object({
-  fantasyName: z.string().min(2, "Nome fantasia deve ter pelo menos 2 caracteres"),
-  responsibleName: z.string().min(2, "Nome do responsável deve ter pelo menos 2 caracteres"),
+  nomeFantasia: z.string().min(2, "Nome fantasia deve ter pelo menos 2 caracteres"),
+  responsavel: z.string().min(2, "Nome do responsável deve ter pelo menos 2 caracteres"),
   email: z.string().email("Email inválido"),
-  phone: z.string().min(10, "Telefone deve ter pelo menos 10 caracteres"),
+  telefone: z.string().min(10, "Telefone deve ter pelo menos 10 caracteres"),
 });
 
 type ProviderFormData = z.infer<typeof providerSchema>;
@@ -24,49 +27,99 @@ type ProviderFormData = z.infer<typeof providerSchema>;
 export default function EditProvider() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  // const { toast } = useToast();
+  const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const provider = mockProviders.find(p => p.id === id);
+  const [isLoading, setIsLoading] = useState(true);
 
   const form = useForm<ProviderFormData>({
     resolver: zodResolver(providerSchema),
-    defaultValues: {
-      fantasyName: provider?.fantasyName || "",
-      responsibleName: provider?.responsibleName || "",
-      email: provider?.email || "",
-      phone: provider?.phone || "",
-    },
   });
 
-  if (!provider) {
+  // useEffect para carregar os dados do provedor
+  useEffect(() => {
+    const loadProvider = async () => {
+      if (!id) {
+        navigate("/providers");
+        return;
+      }
+      try {
+        const data = await getProviderById(id);
+        // Preenche o formulário com os dados do backend
+        form.reset({
+          nomeFantasia: data.nomeFantasia,
+          responsavel: data.responsavel,
+          email: data.email,
+          telefone: data.telefone,
+        });
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Erro ao carregar provedor:", error);
+        toast({
+          title: "Erro",
+          description: "Não foi possível carregar os dados do provedor.",
+          variant: "destructive",
+        });
+        navigate("/providers");
+      }
+    };
+
+    loadProvider();
+  }, [id, form, navigate, toast]);
+
+  const onSubmit = async (data: ProviderFormData) => {
+    if (!id) return;
+    setIsSubmitting(true);
+    
+    try {
+      // Chama a API de atualização
+      await updateProvider(id, data);
+      
+      toast({
+        title: "Sucesso!",
+        description: "Provedor atualizado com sucesso.",
+      });
+      
+      navigate("/providers");
+    } catch (error) {
+      console.error("Erro ao atualizar provedor:", error);
+      toast({
+        title: "Erro",
+        description: "Ocorreu um erro ao atualizar o provedor.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Carregando ou Provedor não encontrado
+  if (isLoading) {
     return (
       <AppLayout>
         <div className="text-center py-12">
-          <h2 className="text-2xl font-bold text-foreground">Provedor não encontrado</h2>
-          <Button onClick={() => navigate("/providers")} className="mt-4">
-            Voltar para Provedores
-          </Button>
+          <h2 className="text-2xl font-bold text-foreground">Carregando...</h2>
         </div>
       </AppLayout>
     );
   }
 
-  const onSubmit = async (data: ProviderFormData) => {
-    setIsSubmitting(true);
-    
-    // Simular salvamento
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // toast({
-    //   title: "Sucesso!",
-    //   description: "Provedor atualizado com sucesso.",
-    // });
-    
-    console.log("Provedor atualizado:", data);
-    
-    navigate("/providers");
-  };
+  // Se o provedor não foi encontrado após o carregamento (ex: API retornou 404)
+  if (!form.formState.isSubmitted && !form.formState.isValid) {
+      const currentValues = form.getValues();
+      if (Object.values(currentValues).every(val => val === "")) {
+        return (
+            <AppLayout>
+              <div className="text-center py-12">
+                <h2 className="text-2xl font-bold text-foreground">Provedor não encontrado</h2>
+                <Button onClick={() => navigate("/providers")} className="mt-4">
+                  Voltar para Provedores
+                </Button>
+              </div>
+            </AppLayout>
+        );
+      }
+  }
+
 
   return (
     <AppLayout>
@@ -92,7 +145,7 @@ export default function EditProvider() {
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <FormField
                   control={form.control}
-                  name="fantasyName"
+                  name="nomeFantasia"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Nome Fantasia</FormLabel>
@@ -106,7 +159,7 @@ export default function EditProvider() {
 
                 <FormField
                   control={form.control}
-                  name="responsibleName"
+                  name="responsavel"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Nome do Responsável</FormLabel>
@@ -134,7 +187,7 @@ export default function EditProvider() {
 
                 <FormField
                   control={form.control}
-                  name="phone"
+                  name="telefone"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Telefone</FormLabel>

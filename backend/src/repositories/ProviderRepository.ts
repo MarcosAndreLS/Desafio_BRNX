@@ -12,8 +12,12 @@ export class ProviderRepository {
   }
 
   async findById(id: string) {
-    return prisma.provider.findUnique({ where: { id } });
+    return prisma.provider.findUnique({
+      where: { id },
+      include: { demandas: true }, 
+    });
   }
+
 
   async findByEmail(email: string) {
     return prisma.provider.findUnique({ where: { email } });

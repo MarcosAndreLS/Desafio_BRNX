@@ -58,4 +58,12 @@ export class ProviderService {
 
     return providerRepository.updateById(id, data);
   }
+
+  async getProviderById(id: string) {
+    const provider = await providerRepository.findById(id);
+    if (!provider) {
+      throw new Error("Provedor não encontrado");
+    }
+    return provider;
+  }
 }
