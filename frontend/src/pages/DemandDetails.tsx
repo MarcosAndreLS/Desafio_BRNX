@@ -13,13 +13,13 @@ import { Input } from "../components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../components/ui/form";
 import { useToast } from "../hooks/use-toast";
-import { ArrowLeft, Plus, User, Calendar, Clock, AlertTriangle, Trash2, Loader2 } from "lucide-react";
+import { ArrowLeft, Plus, User, Calendar, Clock, AlertTriangle, Trash2, Loader2, Settings } from "lucide-react";
 import { ConfirmDialog } from "../components/ui/confirm-dialog";
 //import { mockDemands, mockConsultors } from "../data/mockData";
 import { Demand } from "@/generated/prisma";
 import { createAction } from "@/api/actions";
 import { getConsultors } from "@/api/users";
-import { getDemandById, deleteDemand } from "@/api/demands";
+import { getDemandById, deleteDemand, updateDemandStatus } from "@/api/demands";
 import { 
   DEMAND_TYPE_LABELS, 
   DEMAND_STATUS_LABELS, 
@@ -53,8 +53,12 @@ export default function DemandDetails() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [actions, setActions] = useState<DemandAction[]>([]);
   const [deleteDialog, setDeleteDialog] = useState(false);
+  const [statusChangeDialog, setStatusChangeDialog] = useState(false);
+  const [pendingStatus, setPendingStatus] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [demand, setDemand] = useState<Demand | null>(null);
+  const [currentStatus, setCurrentStatus] = useState("");
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
   const [consultors, setConsultors] = useState<any[]>([]);
 
@@ -83,6 +87,7 @@ export default function DemandDetails() {
         
         setDemand(demandData);
         setConsultors(consultorsData);
+        setCurrentStatus(demandData.status.toLowerCase());
       } catch (error) {
         console.error("Erro ao buscar dados:", error);
       } finally {
@@ -116,7 +121,7 @@ export default function DemandDetails() {
   };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
+    switch (status.toUpperCase()) {
       case 'PENDENTE': return 'bg-warning text-warning-foreground';
       case 'EM_ANDAMENTO': return 'bg-primary text-primary-foreground';
       case 'CONCLUIDA': return 'bg-success text-success-foreground';
@@ -164,6 +169,43 @@ export default function DemandDetails() {
       });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleStatusChange = (newStatus: string) => {
+    setPendingStatus(newStatus.toLowerCase());
+    setStatusChangeDialog(true);
+  };
+
+  const confirmStatusChange = async () => {
+    if (!id || !pendingStatus) return;
+
+    setIsUpdatingStatus(true);
+    try {
+      // 1. Apenas atualiza o status no backend
+      await updateDemandStatus(id, pendingStatus.toUpperCase()); // Enviar em MAIÚSCULO
+
+      // 2. Após o sucesso, busca a demanda completa e atualizada
+      const completeDemandData = await getDemandById(id);
+      
+      // 3. Atualiza o estado com os dados completos
+      setDemand(completeDemandData);
+      setCurrentStatus(completeDemandData.status.toLowerCase()); // Agora o status virá no formato correto do backend
+      
+      toast({
+        title: "Status atualizado",
+        description: `Status da demanda alterado para ${completeDemandData.status}.`
+      });
+    } catch (error) {
+      console.error("Erro ao alterar o status:", error);
+      toast({
+        title: "Erro",
+        description: "Ocorreu um erro ao alterar o status da demanda.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdatingStatus(false);
+      setStatusChangeDialog(false);
     }
   };
 
@@ -249,9 +291,23 @@ export default function DemandDetails() {
                     <Badge className={getPriorityColor(demand.prioridade)}>
                       {demand.prioridade}
                     </Badge>
-                    <Badge className={getStatusColor(demand.status)}>
-                      {demand.status}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge className={getStatusColor(currentStatus)}>
+                        {currentStatus}
+                      </Badge>
+                      <Select value={currentStatus} onValueChange={handleStatusChange}>
+                        <SelectTrigger className="w-32">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover border border-border z-50">
+                          {Object.entries(DEMAND_STATUS_LABELS).map(([key, label]) => (
+                            <SelectItem key={key} value={key}>
+                              {label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </CardTitle>
               </CardHeader>
@@ -438,6 +494,16 @@ export default function DemandDetails() {
           cancelText="Cancelar"
           variant="destructive"
           icon={<Trash2 className="h-5 w-5 text-destructive" />}
+        />
+        <ConfirmDialog
+          open={statusChangeDialog}
+          onOpenChange={setStatusChangeDialog}
+          onConfirm={confirmStatusChange}
+          title="Alterar Status da Demanda"
+          description={`Tem certeza que deseja alterar o status para "${DEMAND_STATUS_LABELS[pendingStatus as keyof typeof DEMAND_STATUS_LABELS]}"?`}
+          confirmText="Alterar Status"
+          cancelText="Cancelar"
+          icon={<Settings className="h-5 w-5 text-primary" />}
         />
 
         {/* O restante do código do div e AppLayout */}

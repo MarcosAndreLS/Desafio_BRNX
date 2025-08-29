@@ -77,7 +77,7 @@ const Demands = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "PENDENTE":
-        return "bg-secondary text-secondary-foreground";
+        return 'bg-warning text-warning-foreground';
       case "EM_ANDAMENTO":
         return "bg-primary text-primary-foreground";
       case "CONCLUIDA":
