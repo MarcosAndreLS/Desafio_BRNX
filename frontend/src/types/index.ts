@@ -40,16 +40,16 @@ export type DemandType =
   | 'outro';
 
 export type DemandStatus = 
-  | 'PENDENTE' 
-  | 'EM_ANDAMENTO' 
-  | 'CONCLUIDA' 
-  | 'CANCELADA';
+  | 'pendente' 
+  | 'em_andamento' 
+  | 'concluida' 
+  | 'cancelada';
 
 export type DemandPriority = 
-  | 'BAIXA' 
-  | 'MEDIA' 
-  | 'ALTA' 
-  | 'CRITICA';
+  | 'baixa' 
+  | 'media' 
+  | 'alta' 
+  | 'critica';
 
 export type UserRole = 
   | 'administrador' 
