@@ -69,10 +69,10 @@ export default function ProviderDetails() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pendente': return 'bg-warning text-warning-foreground';
-      case 'em_andamento': return 'bg-primary text-primary-foreground';
-      case 'concluida': return 'bg-success text-success-foreground';
-      case 'cancelada': return 'bg-destructive text-destructive-foreground';
+      case 'PENDENTE': return 'bg-warning text-warning-foreground';
+      case 'EM_ANDAMENTO': return 'bg-primary text-primary-foreground';
+      case 'CONCLUIDA': return 'bg-success text-success-foreground';
+      case 'CANCELADA': return 'bg-destructive text-destructive-foreground';
       default: return 'bg-muted text-muted-foreground';
     }
   };
@@ -139,9 +139,10 @@ export default function ProviderDetails() {
               Editar
             </Button>
             <Button
-              variant="destructive"
+              variant="outline"
               size="sm"
               onClick={() => setDeleteDialog({ open: true, providerId: provider.id })}
+              className="border-destructive/20 text-destructive hover:bg-destructive/10"
             >
               <Trash className="h-4 w-4 mr-2" />
               Excluir

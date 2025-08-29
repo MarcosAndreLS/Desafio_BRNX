@@ -14,7 +14,7 @@ export const getProviders = async () => {
 };
 
 // Excluir provedor por ID
-export const deleteProvider = async (id: number) => {
+export const deleteProvider = async (id: string) => {
   await api.delete(`/providers/${id}`);
 };
 
