@@ -32,13 +32,14 @@ Antes de iniciar, certifique-se de ter instalado em sua máquina:
 ## Passos para executar o projeto
 
 1. **Clone o repositório**
-   ```bash
-   git clone https://github.com/MarcosAndreLS/Desafio_BRNX.git
-   cd Desafio_BRNX
+```bash
+git clone https://github.com/MarcosAndreLS/Desafio_BRNX.git
+cd Desafio_BRNX
+```
 
 2. **Configure as variáveis de ambiente**
-    - Crie um arquivo chamado .env dentro da pasta backend/.
-    - Consulte o arquivo .env.example para entender como configurar o DATABASE_URL
+- Crie um arquivo chamado .env dentro da pasta backend/.
+- Consulte o arquivo .env.example para entender como configurar o DATABASE_URL
 
 3. **Iniciar a Aplicação**
 
