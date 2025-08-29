@@ -9,4 +9,6 @@ router.get("/", (req, res) => demandController.list(req, res)); // suporta ?stat
 router.patch("/:id/status", (req, res) => demandController.changeStatus(req, res));
 router.get("/:id", (req, res) => demandController.getById(req, res));
 
+router.delete("/:id", (req, res) => demandController.delete(req, res));
+
 export default router;

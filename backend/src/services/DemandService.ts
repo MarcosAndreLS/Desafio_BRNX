@@ -52,4 +52,12 @@ export class DemandService {
   async getDemandDetails(id: string) {
     return demandRepository.findById(id); 
   }
+
+  async deleteDemand(id: string) {
+    const demand = await demandRepository.findById(id);
+    if (!demand) {
+      throw new Error("Demanda não encontrada.");
+    }
+    return demandRepository.delete(id);
+  }
 }
