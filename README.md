@@ -92,14 +92,16 @@ A aplicação está organizada em duas camadas principais: **Backend** e **Front
 O backend é responsável por fornecer a API REST, gerenciar a lógica de negócio, comunicação com o banco de dados e autenticação de usuários.  
 Ele está estruturado da seguinte forma:
 
+```
 backend/
 ├── 📁controllers/ # Contém os controladores que processam as requisições e chamam os serviços
 ├── 📁routes/ # Define as rotas da API e associa cada endpoint ao seu controller
 ├── 📁services/ # Implementa a lógica de negócio da aplicação
 ├── 📁repositories/ # Camada de acesso ao banco de dados (Prisma ORM)
 ├── .env # Variáveis de ambiente
-├── app.ts / server.ts # Arquivo principal que inicia o servidor Express
+├── server.ts # Arquivo principal que inicia o servidor Express
 └── package.json # Dependências e scripts do backend
+```
 
 **Fluxo típico de uma requisição:**
 1. **Route** recebe a requisição HTTP.
@@ -115,6 +117,7 @@ backend/
 O frontend é responsável pela interface do usuário, comunicação com o backend e apresentação dos dados.  
 Ele está estruturado da seguinte forma:
 
+```
 frontend/
 ├── src/
 │ ├── 📁components/ # Componentes reutilizáveis da interface (botões, inputs, cards)
@@ -123,6 +126,7 @@ frontend/
 │ ├── 📁api/ # Funções de comunicação com a API (axios)
 ├── public/ # Arquivos públicos (imagens, favicon)
 └── package.json # Dependências e scripts do frontend
+```
 
 **Fluxo típico de interação:**
 1. Usuário interage com **componentes** da interface.
