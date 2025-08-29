@@ -12,3 +12,8 @@ export const getConsultors = async () => {
   const { data } = await api.get("/users/consultors"); 
   return data;
 };
+
+export const getAtendentes = async () => {
+  const { data } = await api.get("/users/atendentes");
+  return data;
+};

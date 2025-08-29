@@ -13,6 +13,7 @@ export class DemandRepository {
     include: {
       provider: true, // Já estava presente
       actions: true,  // Adicionado para incluir as ações
+      atendente: true,
     },
     orderBy: {
       createdAt: 'desc', // Adiciona ordenação para que as demandas mais recentes apareçam primeiro
@@ -30,6 +31,7 @@ export class DemandRepository {
             tecnico: true, // Adicionado para incluir os dados do técnico na ação
           },
         },
+        atendente: true, 
       },
     });
   }

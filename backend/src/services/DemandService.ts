@@ -9,7 +9,8 @@ export class DemandService {
     descricao: string,
     tipo: DemandType,
     prioridade: keyof typeof DemandPriority, // string do body
-    providerId: string
+    providerId: string,
+    atendenteId: string
   ) {
     return demandRepository.create({
       titulo,
@@ -17,6 +18,7 @@ export class DemandService {
       tipo,
       prioridade: DemandPriority[prioridade], // converte string para enum
       providerId,
+      atendenteId, 
       status: DemandStatus.PENDENTE,
     });
   }

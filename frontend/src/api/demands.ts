@@ -1,4 +1,6 @@
 import axios from "axios";
+import { Demand, DemandStatus, DemandPriority, DemandType } from "@/generated/prisma";
+
 
 const api = axios.create({
   baseURL: "http://localhost:8000",
@@ -6,6 +8,16 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+// Corrigido: Definição explícita das propriedades
+type DemandCreateData = {
+  titulo: string;
+  descricao: string;
+  tipo: DemandType;
+  prioridade: DemandPriority;
+  providerId: string;
+  atendenteId: string;
+};
 
 export const getDemands = async (statusFilter?: string) => {
   const params = statusFilter && statusFilter !== "all" ? { status: statusFilter.toUpperCase() } : {};
@@ -24,9 +36,17 @@ export const getDemandById = async (id: string) => {
   const { data } = await api.get(`/demands/${id}`);
   return data;
 };
+
 // Função para deletar uma demanda
 export const deleteDemand = async (id: string) => {
   // Faz uma requisição DELETE para o endpoint de exclusão
   const { data } = await api.delete(`/demands/${id}`);
   return data;
+};
+
+// Função para criar uma nova demanda
+export const createDemand = async (demand: DemandCreateData) => {
+    console.log("Payload enviado:", demand);
+  const response = await api.post("/demands", demand);
+  return response.data;
 };

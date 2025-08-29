@@ -7,8 +7,8 @@ const demandService = new DemandService();
 export class DemandController {
   async create(req: Request, res: Response) {
     try {
-      const { titulo, descricao, tipo, prioridade, providerId } = req.body;
-      const demand = await demandService.createDemand(titulo, descricao, tipo, prioridade, providerId);
+      const { titulo, descricao, tipo, prioridade, providerId, atendenteId } = req.body; 
+      const demand = await demandService.createDemand(titulo, descricao, tipo, prioridade, providerId, atendenteId); 
       return res.status(201).json(demand);
     } catch (err: any) {
       return res.status(400).json({ error: err.message });

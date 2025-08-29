@@ -50,6 +50,7 @@ CREATE TABLE "public"."Demand" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "providerId" TEXT NOT NULL,
+    "atendenteId" TEXT,
 
     CONSTRAINT "Demand_pkey" PRIMARY KEY ("id")
 );
@@ -95,6 +96,9 @@ CREATE INDEX "Action_tipo_idx" ON "public"."Action"("tipo");
 
 -- AddForeignKey
 ALTER TABLE "public"."Demand" ADD CONSTRAINT "Demand_providerId_fkey" FOREIGN KEY ("providerId") REFERENCES "public"."Provider"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."Demand" ADD CONSTRAINT "Demand_atendenteId_fkey" FOREIGN KEY ("atendenteId") REFERENCES "public"."User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."Action" ADD CONSTRAINT "Action_demandId_fkey" FOREIGN KEY ("demandId") REFERENCES "public"."Demand"("id") ON DELETE CASCADE ON UPDATE CASCADE;

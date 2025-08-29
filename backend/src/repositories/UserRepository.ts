@@ -16,4 +16,16 @@ export class UserRepository {
       },
     });
   }
+
+  async findAllAtendentes() {
+    return prisma.user.findMany({
+      where: {
+        role: UserRole.ATENDENTE,
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+  }
 }

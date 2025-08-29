@@ -203,6 +203,13 @@ const Demands = () => {
                         <Calendar className="h-4 w-4 mr-1" />
                         {new Date(demand.createdAt).toLocaleDateString("pt-BR")}
                       </div>
+
+                      {demand.atendente && (
+                        <div className="flex items-center">
+                          <User className="h-4 w-4 mr-1" />
+                          {demand.atendente.name}
+                        </div>
+                      )}
                       {/* Removido o campo assignedTo pois não existe no seu schema */}
                       <Badge variant="outline" className="text-xs">
                         {demand.tipo}

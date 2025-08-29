@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,10 +10,18 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+
 import { mockProviders } from "@/data/mockData";
-import { DEMAND_TYPE_LABELS, DEMAND_PRIORITY_LABELS, DemandType, DemandPriority } from "@/types";
+import { getAtendentes } from "@/api/users";
+import { getProviders } from "@/api/providers"; 
+import { createDemand } from "@/api/demands";
+
+import { Provider, User, DemandType, DemandPriority } from "@/generated/prisma"; 
+
+import { DEMAND_TYPE_LABELS, DEMAND_PRIORITY_LABELS} from "@/types";
 
 const demandSchema = z.object({
   title: z.string().min(5, "Título deve ter pelo menos 5 caracteres"),
@@ -21,6 +29,7 @@ const demandSchema = z.object({
   type: z.string(),
   priority: z.string(),
   providerId: z.string().min(1, "Selecione um provedor"),
+  atendenteId: z.string().min(1, "Selecione o atendente"), 
 });
 
 type DemandFormData = z.infer<typeof demandSchema>;
@@ -29,6 +38,10 @@ export default function NewDemand() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(true);
+
+  const [providers, setProviders] = useState<Provider[]>([]);
+  const [atendentes, setAtendentes] = useState<User[]>([]);
 
   const form = useForm<DemandFormData>({
     resolver: zodResolver(demandSchema),
@@ -38,23 +51,73 @@ export default function NewDemand() {
       type: "",
       priority: "",
       providerId: "",
+      atendenteId: "",
     },
   });
 
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoadingData(true);
+      try {
+        const [providersData, atendentesData] = await Promise.all([
+          getProviders(),
+          getAtendentes(),
+        ]);
+        setProviders(providersData);
+        setAtendentes(atendentesData);
+      } catch (error) {
+        console.error("Erro ao buscar dados:", error);
+      } finally {
+        setIsLoadingData(false);
+      }
+    };
+    fetchData();
+  }, []);
+
   const onSubmit = async (data: DemandFormData) => {
     setIsSubmitting(true);
-    
-    // Simular salvamento
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    toast({
-      title: "Sucesso!",
-      description: "Demanda cadastrada com sucesso.",
-    });
-    
-    setIsSubmitting(false);
-    navigate("/demands");
+    try {
+      const payload = {
+        titulo: data.title,
+        descricao: data.description,
+        // CORREÇÃO: Converte os valores para maiúsculas
+        tipo: data.type.toUpperCase(),
+        prioridade: data.priority.toUpperCase(),
+        providerId: data.providerId,
+        atendenteId: data.atendenteId,
+      };
+
+      // Agora o `payload` está com os valores no formato correto para a API
+      await createDemand(payload);
+      
+      toast({
+        title: "Sucesso!",
+        description: "Demanda cadastrada com sucesso.",
+      });
+      
+      navigate("/demands");
+    } catch (error) {
+      console.error("Erro ao cadastrar demanda:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível cadastrar a demanda.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  if (isLoadingData) {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <span className="ml-2 text-lg text-muted-foreground">Carregando dados...</span>
+        </div>
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout>
@@ -176,9 +239,9 @@ export default function NewDemand() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {mockProviders.map((provider) => (
+                          {providers.map((provider) => (
                             <SelectItem key={provider.id} value={provider.id}>
-                              {provider.fantasyName}
+                              {provider.nomeFantasia}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -187,6 +250,31 @@ export default function NewDemand() {
                     </FormItem>
                   )}
                 />
+
+                <FormField
+                      control={form.control}
+                      name="atendenteId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Atendente</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecione o atendente" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {atendentes.map((atendente) => (
+                                <SelectItem key={atendente.id} value={atendente.id}>
+                                  {atendente.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
                 <div className="flex space-x-4 pt-4">
                   <Button 

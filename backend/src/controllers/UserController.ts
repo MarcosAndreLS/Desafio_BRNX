@@ -14,4 +14,13 @@ export class UserController {
       return res.status(500).json({ error: 'Erro ao listar consultores.' });
     }
   }
+
+  async listAtendentes(req: Request, res: Response) {
+    try {
+      const atendentes = await userService.listAtendentes();
+      return res.json(atendentes);
+    } catch (error: any) {
+      return res.status(500).json({ error: 'Erro ao listar atendentes.' });
+    }
+  }
 }

@@ -8,4 +8,8 @@ export class UserService {
   async listConsultors() {
     return userRepository.findAllConsultors();
   }
+
+  async listAtendentes() {
+    return userRepository.findAllAtendentes();
+  }
 }
