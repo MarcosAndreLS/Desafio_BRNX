@@ -32,12 +32,12 @@ const navigationItems = [
     icon: ClipboardList,
     description: "Acompanhar demandas"
   },
-  {
-    title: "Configurações",
-    href: "/settings",
-    icon: Settings,
-    description: "Configurar sistema"
-  }
+  // {
+  //   title: "Configurações",
+  //   href: "/settings",
+  //   icon: Settings,
+  //   description: "Configurar sistema"
+  // }
 ];
 
 interface AppSidebarProps {
