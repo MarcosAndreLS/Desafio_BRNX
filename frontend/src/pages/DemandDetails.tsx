@@ -274,6 +274,13 @@ export default function DemandDetails() {
                       {demand.tipo}
                     </span>
                   </div>
+                  {demand.atendente && (
+                    <div className="flex items-center space-x-2">
+                      <User className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-muted-foreground">Atendente:</span>
+                      <span className="font-medium">{demand.atendente.name}</span>
+                    </div>
+                  )}
                   <div className="flex items-center space-x-2">
                     <Calendar className="h-4 w-4 text-muted-foreground" />
                     <span className="text-muted-foreground">Criado em:</span>

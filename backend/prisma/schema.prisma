@@ -63,6 +63,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   actions   Action[]
+  atendenteDemands Demand[] @relation(name: "AtendenteDemands")
 }
 
 model Provider {
@@ -91,6 +92,9 @@ model Demand {
 
   providerId  String
   provider    Provider        @relation(fields: [providerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  atendenteId String?
+  atendente   User?     @relation(fields: [atendenteId], references: [id], onDelete: SetNull, name: "AtendenteDemands")
 
   actions     Action[]
 
