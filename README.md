@@ -44,9 +44,9 @@ Antes de iniciar, certifique-se de ter instalado em sua máquina:
 
 Com tudo configurado, utilize o Docker Compose para construir as imagens e iniciar os contêineres. Execute o seguinte comando a partir da raiz do projeto (onde o arquivo docker-compose.yml se encontra):
 
-    ```bash
-    docker-compose up --build
-    ```
+```bash
+docker-compose up --build
+```
 
 Este comando irá baixar a imagem do PostgreSQL, construir as imagens para o backend e frontend e iniciar todos os serviços. Você verá os logs de cada serviço no seu terminal.
 
