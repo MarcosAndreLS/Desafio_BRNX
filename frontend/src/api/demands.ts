@@ -24,3 +24,9 @@ export const getDemandById = async (id: string) => {
   const { data } = await api.get(`/demands/${id}`);
   return data;
 };
+// Função para deletar uma demanda
+export const deleteDemand = async (id: string) => {
+  // Faz uma requisição DELETE para o endpoint de exclusão
+  const { data } = await api.delete(`/demands/${id}`);
+  return data;
+};

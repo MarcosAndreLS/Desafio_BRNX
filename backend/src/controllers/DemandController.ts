@@ -60,4 +60,14 @@ export class DemandController {
       return res.status(400).json({ error: err.message });
     }
   }
+
+  async delete(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      await demandService.deleteDemand(id);
+      return res.status(204).send(); // Status 204 indica sucesso sem conteúdo
+    } catch (err: any) {
+      return res.status(404).json({ error: err.message });
+    }
+  }
 }

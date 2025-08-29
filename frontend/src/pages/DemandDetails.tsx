@@ -19,7 +19,7 @@ import { ConfirmDialog } from "../components/ui/confirm-dialog";
 import { Demand } from "@/generated/prisma";
 import { createAction } from "@/api/actions";
 import { getConsultors } from "@/api/users";
-import { getDemandById } from "@/api/demands";
+import { getDemandById, deleteDemand } from "@/api/demands";
 import { 
   DEMAND_TYPE_LABELS, 
   DEMAND_STATUS_LABELS, 
@@ -50,6 +50,7 @@ export default function DemandDetails() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [actions, setActions] = useState<DemandAction[]>([]);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -168,12 +169,29 @@ export default function DemandDetails() {
 
   const allActions = [...demand.actions, ...actions];
 
-  const handleDeleteDemand = () => {
-    toast({
-      title: "Demanda excluída",
-      description: "A demanda foi removida com sucesso!"
-    });
-    navigate("/demands");
+  const handleDeleteDemand = async () => {
+    if (!id) return;
+
+    setIsDeleting(true);
+    try {
+      await deleteDemand(id);
+      
+      toast({
+        title: "Demanda excluída",
+        description: "A demanda foi removida com sucesso!"
+      });
+      navigate("/demands");
+    } catch (error) {
+      console.error("Erro ao excluir a demanda:", error);
+      toast({
+        title: "Erro",
+        description: "Ocorreu um erro ao excluir a demanda.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+      setDeleteDialog(false);
+    }
   };
 
   if (isLoading) {
@@ -212,10 +230,11 @@ export default function DemandDetails() {
           <Button 
             variant="outline"
             onClick={() => setDeleteDialog(true)}
+            disabled={isDeleting} // Desabilita o botão durante a exclusão
             className="border-destructive/20 text-destructive hover:bg-destructive/10"
           >
-            <Trash2 className="h-4 w-4 mr-2" />
-            Excluir Demanda
+            {isDeleting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Trash2 className="h-4 w-4 mr-2" />}
+            {isDeleting ? "Excluindo..." : "Excluir Demanda"}
           </Button>
         </div>
 
@@ -291,7 +310,7 @@ export default function DemandDetails() {
                           </div>
                         </div>
                         <p className="text-sm text-foreground mb-1">{action.descricao}</p>
-                        <p className="text-xs text-muted-foreground">Por: {action.tecnico?.nome || 'Não atribuído'}</p>
+                        <p className="text-xs text-muted-foreground">Por: {action.tecnico?.name || 'Não atribuído'}</p>
                       </div>
                     ))}
                   </div>

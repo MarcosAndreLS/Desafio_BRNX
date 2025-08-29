@@ -40,4 +40,11 @@ export class DemandRepository {
       data: { status },
     });
   }
+
+  async delete(id: string) {
+    return prisma.demand.delete({
+      where: { id },
+    });
+  }
+
 }
